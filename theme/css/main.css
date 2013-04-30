@@ -23,7 +23,7 @@ body {
 }
 
 #content {
-    /*overflow: hidden;*/
+    min-height: 190px;
 }
 
 #footer {
@@ -118,7 +118,6 @@ nav a i {
 
 #post-list li {
     width: 49%;
-    /*margin: 0 2em 2em 0;*/
     padding: 0;
     text-align: center;
     margin-bottom: 5em;
@@ -133,8 +132,8 @@ nav a i {
 }
 
 #post-list li .summary {
-    width:66%;
-    margin:0 auto;
+    width: 66%;
+    margin: 0 auto;
 }
 
 .highlight {
@@ -249,8 +248,20 @@ code, pre {
         margin-top: 0;
     }
 
-}
+    #post-list li .summary {
+        width: auto;
+        margin: 0;
+    }
 
+    #content h2,
+    #content h3 {
+        margin-top: 1.5em;
+    }
+
+    pre, code {
+        margin: 1.5em 0;
+    }
+}
 
 @font-face {
     font-family: 'MerriweatherLight';
