@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 AUTHOR = u'Monkey'
 SITENAME = u'5 Monkeys'
 SITESUBTITLE = u'labs blog'
-SITEURL = 'http://5monkeys.github.io/blog/'
+SITEURL = 'http://5monkeys.github.io/blog'
 
 TIMEZONE = 'Europe/Stockholm'
 DEFAULT_LANG = u'en'
