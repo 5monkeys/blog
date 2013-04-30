@@ -23,7 +23,7 @@ body {
 }
 
 #content {
-    /*overflow: hidden;*/
+    min-height: 190px;
 }
 
 #footer {
@@ -52,6 +52,7 @@ nav a i {
 
 #header h1 {
     background: url('../img/logo.png') no-repeat bottom left;
+    background-size: 150px 46px;
     width: 150px;
     height: 51px;
     margin: 0 12px 0 0;
@@ -117,7 +118,6 @@ nav a i {
 
 #post-list li {
     width: 49%;
-    /*margin: 0 2em 2em 0;*/
     padding: 0;
     text-align: center;
     margin-bottom: 5em;
@@ -132,8 +132,8 @@ nav a i {
 }
 
 #post-list li .summary {
-    width:66%;
-    margin:0 auto;
+    width: 66%;
+    margin: 0 auto;
 }
 
 .highlight {
@@ -180,7 +180,7 @@ code, pre {
     }
 }
 
-@media (min-width: 890px) {
+@media (min-width: 910px) {
     .entry-content p {
         width: 600px;
     }
@@ -194,7 +194,7 @@ code, pre {
     }
 }
 
-@media (max-width: 890px) {
+@media (max-width: 910px) {
 
     body {
         font-size: 0.9em;
@@ -224,8 +224,44 @@ code, pre {
     #header {
         margin-bottom: 0;
     }
-}
 
+    #post-list li {
+        width: auto;
+        padding: 1em 0;
+        margin-bottom: 1em;
+        border-bottom: 1px dashed #ccc;
+    }
+
+    #post-list li:last-child {
+        border-bottom: 0;
+    }
+
+    #post-list li.odd {
+        float: none;
+    }
+
+    #post-list li.even {
+        float: none;
+    }
+
+    #post-list article h2 {
+        margin-top: 0;
+    }
+
+    #post-list li .summary {
+        width: auto;
+        margin: 0;
+    }
+
+    #content h2,
+    #content h3 {
+        margin-top: 1.5em;
+    }
+
+    pre, code {
+        margin: 1.5em 0;
+    }
+}
 
 @font-face {
     font-family: 'MerriweatherLight';
