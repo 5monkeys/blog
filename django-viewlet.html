@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+    <head>
+    <title>5 Monkeys</title>
+        <meta charset="utf-8" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link href="/theme/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="/theme/css/font-awesome.min.css" rel="stylesheet" media="screen">
+        <link href="/theme/css/pygments.css" rel="stylesheet" media="screen">
+        <link href="/theme/css/main.css" rel="stylesheet" media="screen">
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="5 Monkeys Full Atom Feed" />
+        <link href="/feeds/django.atom.xml" type="application/atom+xml" rel="alternate" title="5 Monkeys Categories Atom Feed" />
+        
+    </head>
+
+    <body>
+        <header id="header">
+            <div class="container">
+                <nav id="menu" class="navbar">
+                    <h1><a href="">5 Monkeys</a></h1>
+                    <span class="subtitle">labs blog</span>
+                    <ul>                                                                        </ul>
+                </nav>
+            </div>
+        </header>
+
+        <div id="page" class="container">
+
+            <section id="content">
+                
+    <article>
+        <header>
+            <h1 class="entry-title">
+              <a href="/django-viewlet.html" rel="bookmark"
+                 title="Permalink to Django Viewlet">Django&nbsp;Viewlet</a></h1>
+                        
+        </header>
+        <div class="summary">
+            <p class="first last">Render template parts with extended cache control.</p>
+
+        </div>
+        <div class="tags">
+                        <span class="tag"><i class="icon-tag"></i> cache</span>
+                        <span class="tag"><i class="icon-tag"></i> template</span>
+                    </div>
+        <footer class="post-info">
+            <abbr class="published" title="2012-11-17T12:00:00">
+                Sat 17 November 2012
+            </abbr>
+            <address class="vcard author">
+                                        By Jonas Lundberg
+                </address>
+            </footer>
+        <div class="entry-content">
+            <div class="section" id="installation">
+<h2>Installation</h2>
+<p>Install django-viewlet in your python&nbsp;environment</p>
+<div class="highlight"><pre><span class="nv">$ </span>pip install django-viewlet
+</pre></div>
+<p>Add <tt class="docutils literal">viewlet</tt> to your <tt class="docutils literal">INSTALLED_APPS</tt> setting so Django can find the template&nbsp;tag</p>
+<div class="highlight"><pre><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="o">...</span>
+    <span class="s">&#39;viewlet&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+<p>If you&#8217;re using Jinja2 as your template engine put this in your Django&nbsp;settings</p>
+<div class="highlight"><pre><span class="n">JINJA2_GLOBALS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&#39;viewlet&#39;</span><span class="p">:</span> <span class="s">&#39;viewlet.call_viewlet&#39;</span>
+<span class="p">}</span>
+
+<span class="n">VIEWLET_TEMPLATE_ENGINE</span> <span class="o">=</span> <span class="s">&#39;jinja2&#39;</span>
+</pre></div>
+</div>
+<div class="section" id="usage">
+<h2>Usage</h2>
+<p>A viewlet is almost like a function based django view, taking a template context
+as first argument instead of request.
+Place your viewlets in <tt class="docutils literal">viewlets.py</tt> or existing <tt class="docutils literal">views.py</tt> in your django app&nbsp;directory.</p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.template.loader</span> <span class="kn">import</span> <span class="n">render_to_string</span>
+<span class="kn">from</span> <span class="nn">viewlet</span> <span class="kn">import</span> <span class="n">viewlet</span>
+
+<span class="nd">@viewlet</span>
+<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+</pre></div>
+<p>You can then render the viewlet with the <tt class="docutils literal">viewlet</tt> template&nbsp;tag:</p>
+<div class="highlight"><pre>{% load viewlets %}
+<span class="nt">&lt;p&gt;</span>{% viewlet hello_user request.user.username %}<span class="nt">&lt;/p&gt;</span>
+</pre></div>
+<p>&#8230; and in your Jinja2&nbsp;templates:</p>
+<div class="highlight"><pre><span class="nt">&lt;p&gt;</span>{{ viewlet(&#39;host_sponsors&#39;, host.id) }}<span class="nt">&lt;/p&gt;</span>
+</pre></div>
+<div class="section" id="refreshing-viewlets">
+<h3>Refreshing&nbsp;viewlets</h3>
+<p>A cached viewlet can be re-rendered and updated behind the scenes with <tt class="docutils literal">viewlet.refresh</tt></p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">viewlet</span>
+<span class="n">viewlet</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="s">&#39;hello_user&#39;</span><span class="p">,</span> <span class="s">&#39;monkey&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="the-decorator">
+<h3>The&nbsp;decorator</h3>
+<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">cached</span><span class="p">)</span>
+</pre></div>
+<ul>
+<li><dl class="first docutils">
+<dt>name</dt>
+<dd><p class="first last">Optional reference name for the viewlet, defaults to function&nbsp;name.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>template</dt>
+<dd><p class="first last">Optional path to template. If specified the viewlet must return a context dict,
+otherwise it is responsible to return the rendered output&nbsp;itself.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>key</dt>
+<dd><p class="first last">Optional cache key, if not specified a dynamic key will be generated <tt class="docutils literal"><span class="pre">viewlet:name(args&#8230;)</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>timeout</dt>
+<dd><p class="first last">Cache timeout. Defaults to 60 sec, None = eternal, 0 =&nbsp;uncached.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>cached</dt>
+<dd><p class="first last">Defaults to True, if set to False timeout will be 0 and therefore&nbsp;uncached.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="examples">
+<h3>Examples</h3>
+<p>The content returned by the viewlet will by default be cached for 60s. Use the <tt class="docutils literal">timeout</tt> argument to change&nbsp;this.</p>
+<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+</pre></div>
+<!--  -->
+<blockquote>
+<strong>Tip:</strong> Set <tt class="docutils literal">timeout</tt> to <tt class="docutils literal">None</tt> to cache forever and use <tt class="docutils literal">viewlet.refresh</tt> to update the cache.</blockquote>
+<p>Django viewlet will by default build a cache key <tt class="docutils literal"><span class="pre">viewlet:name(args&#8230;)</span></tt>.
+To customize this key pass a string to the viewlet decorator argument <tt class="docutils literal">key</tt></p>
+<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s">&#39;some_cache_key&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+</pre></div>
+<p>Django viewlet will cache context instead of html by using the <tt class="docutils literal">template</tt> decorator argument.
+This is useful if cached html is too heavy, or your viewlet template needs to be rendered on every&nbsp;call.</p>
+<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">}</span>
+</pre></div>
+<!--  -->
+<blockquote>
+<strong>Note:</strong> Return context dict for the template, not rendered html/text</blockquote>
+<p>If there is no need for caching, set the viewlet decorator argument <tt class="docutils literal">cached</tt> to <tt class="docutils literal">False</tt></p>
+<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+</pre></div>
+<p>By default you viewlets will be named as the function. To override this you can set the decorator argument <tt class="docutils literal">name</tt></p>
+<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;greeting&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+</pre></div>
+<p>A powerful usage of <tt class="docutils literal">viewlet.refresh</tt> is to use it together with Django&nbsp;signals:</p>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">Product</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+
+<span class="nd">@viewlet</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">product_teaser</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="n">product</span> <span class="o">=</span> <span class="n">get_context_object</span><span class="p">(</span><span class="n">Product</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;product_teaser.html&#39;</span><span class="p">,</span> <span class="nb">locals</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">refresh_product_teaser</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">viewlet</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="s">&#39;product_teaser&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+<span class="n">post_save</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">refresh_product_teaser</span><span class="p">,</span> <span class="n">Product</span><span class="p">)</span>
+</pre></div>
+<p>Viewlets can also be accesses with <span class="caps">AJAX</span> by adding <tt class="docutils literal">viewlet.urls</tt> to your Django root&nbsp;urls:</p>
+<div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s">r&#39;^viewlet/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;viewlet.urls&#39;</span><span class="p">)),</span>
+<span class="p">)</span>
+</pre></div>
+<p>The url ends with the viewlet name followed by a querystring used as <tt class="docutils literal">kwargs</tt> to the&nbsp;viewlet:</p>
+<!--  -->
+<blockquote>
+<a class="reference external" href="http://localhost:8000/viewlet/[name]/?arg=1">http://localhost:8000/viewlet/[name]/?arg=1</a>&#8230;</blockquote>
+<a class="reference external image-reference" href="http://travis-ci.org/5monkeys/django-viewlet"><img alt="https://travis-ci.org/5monkeys/django-viewlet.png?branch=master" src="https://travis-ci.org/5monkeys/django-viewlet.png?branch=master" /></a>
+</div>
+</div>
+
+        </div>
+    </article>
+
+            </section>
+
+            <footer id="footer">
+                <address>
+                    <a href="http://www.5monkeys.se/">5 Monkeys</a> &copy; 2013
+                </address>
+            </footer>
+
+        </div>
+    </body>
+</html>
