@@ -52,6 +52,7 @@ nav a i {
 
 #header h1 {
     background: url('../img/logo.png') no-repeat bottom left;
+    background-size: 150px 46px;
     width: 150px;
     height: 51px;
     margin: 0 12px 0 0;
@@ -180,7 +181,7 @@ code, pre {
     }
 }
 
-@media (min-width: 890px) {
+@media (min-width: 910px) {
     .entry-content p {
         width: 600px;
     }
@@ -194,7 +195,7 @@ code, pre {
     }
 }
 
-@media (max-width: 890px) {
+@media (max-width: 910px) {
 
     body {
         font-size: 0.9em;
@@ -224,6 +225,30 @@ code, pre {
     #header {
         margin-bottom: 0;
     }
+
+    #post-list li {
+        width: auto;
+        padding: 1em 0;
+        margin-bottom: 1em;
+        border-bottom: 1px dashed #ccc;
+    }
+
+    #post-list li:last-child {
+        border-bottom: 0;
+    }
+
+    #post-list li.odd {
+        float: none;
+    }
+
+    #post-list li.even {
+        float: none;
+    }
+
+    #post-list article h2 {
+        margin-top: 0;
+    }
+
 }
 
 
