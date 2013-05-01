@@ -2,48 +2,69 @@ Django Viewlet
 ==============
 
 :date: 2012-11-17 12:00
-:tags: cache, template
+:tags: cache, template, optimizing
 :category: django
 :slug: django-viewlet
 :author: Jonas Lundberg
 :summary: Render template parts with extended cache control.
 
 
-Installation
-------------
+Find and analyze your problem
+-----------------------------
+A common problem when building web sites is that they tend to load slower and slower when the user base starts to grow,
+and the requests/sec has to reach the next level.
 
-Install django-viewlet in your python environment
+These slow responses often depend on third party resources like a database or external service api's.
+A great solution to improve page speed is to start caching slow parts of your logic and context.
 
-.. code-block:: sh
+But, before doing this you should always try to optimize the code that are about to be cached, you don't want to "hide" dirty code.
 
-    $ pip install django-viewlet
+A few simple tips:
 
-Add ``viewlet`` to your ``INSTALLED_APPS`` setting so Django can find the template tag
+* try to decrease number of database queries
+* make sure your slow or common queries are well indexed
+* if using Django's ORM, use .values() or .values_list() to fetch less data and decrease cpu/mem.
+* fine-tune your resources to line up with your current state of load and memory
 
-.. code-block:: python
+So, just by caching your way out doesn't mean that your code won't be run, and still needs to perform well.
+The next step is to figure out *what* to cache, *when* and *how* to trigger it.
 
-    INSTALLED_APPS = (
-        ...
-        'viewlet',
-    )
+Django's cache framework
+________________________
+Django has a few built in solutions for caching, per-site, per-view and template fragment caching.
+Per-site and per-view are great tools when your response is anonymous, not containing any user specific stuff
+and if your content doesn't get updated frequently.
 
+Since these two will cache your whole response they are quite hard to use on highly dynamic pages. ``Varnish`` could be a better alternative.
 
-If you're using Jinja2 as your template engine put this in your Django settings
+Template fragment cache on the other hand is a good way to cache parts of your template that are equal to every user like a menu, sidebar, footer etc.
 
-.. code-block:: python
+Caching the right stuff
+_______________________
+This seems to be an easy and good way to solve your problem, but what if the "slow" context variable, like a queryset, already have been executed in the view resulting an even slower page,
+since you're not caching the slow stuff but actually adding one more resource to the page, the cache it self.
+This can be solved by using Django's inclusion tags and move context related code from your view to a new tag and wrap that with a cache tag, quite messy.
 
-    JINJA2_GLOBALS = {
-        'viewlet': 'viewlet.call_viewlet'
-    }
+Timeouts
+________
+Another problem when caching is that you mostly need to set a timeout, for example using the cache tag and set the timeout to 300 seconds,
+resulting in your actual code to be re-run every 5 minute. The issue here lies in the re-run part. There's no async stuff going on here,
+meaning that one of your regular requests will be the one hitting the timeout and causing the code to run once again and re-fill the cache.
+A dirty "solution" to this is to brute-force loading your site with a cron-like utility and at a higher frequency than your cache timeouts.
 
-    VIEWLET_TEMPLATE_ENGINE = 'jinja2'
+Solving the problem
+-------------------
+In my opinion, this is not a good way to cache your site, because the speed will vary and the end user will take the hit and trigger your data to reload.
 
+This is why we wrote ``Django Viewlet``.
+
+A viewlet is almost like a function based django view, taking a template context as first argument instead of request.
+The result of a viewlet is cached and, best of all, able to be refreshed.
+It's recommended to set your viewlet to never timeout, meaning cache forever.
 
 Usage
------
+_____
 
-A viewlet is almost like a function based django view, taking a template context
-as first argument instead of request.
 Place your viewlets in ``viewlets.py`` or existing ``views.py`` in your django app directory.
 
 .. code-block:: python
@@ -64,12 +85,8 @@ You can then render the viewlet with the ``viewlet`` template tag:
     <p>{% viewlet hello_user request.user.username %}</p>
 
 
-... and in your Jinja2 templates:
-
-.. code-block:: html
-
-    <p>{{ viewlet('host_sponsors', host.id) }}</p>
-
+Normally you'll return a rendered template from your viewlet,
+but you can also return a context if you need your viewlet template to be rendered on every request, causing the context itself to be cached instead.
 
 Refreshing viewlets
 ___________________
@@ -82,96 +99,18 @@ A cached viewlet can be re-rendered and updated behind the scenes with ``viewlet
     viewlet.refresh('hello_user', 'monkey')
 
 
-The decorator
-_____________
+Content on your site will always get updated by some kind of action, like saving a model or a celery task being executed, modifying some data.
+
+Try to find these triggers and then hook in your viewlet.refresh there.
+
+Django signals is a good way of doing this, by either connecting to an existing one like post_save, or dispatching your own.
 
 .. code-block:: python
-
-    @viewlet(name, template, key, timeout, cached)
-
-
-* name
-    Optional reference name for the viewlet, defaults to function name.
-* template
-    Optional path to template. If specified the viewlet must return a context dict,
-    otherwise it is responsible to return the rendered output itself.
-* key
-    Optional cache key, if not specified a dynamic key will be generated ``viewlet:name(args...)``
-* timeout
-    Cache timeout. Defaults to 60 sec, None = eternal, 0 = uncached.
-* cached
-    Defaults to True, if set to False timeout will be 0 and therefore uncached.
-
-
-Examples
-________
-
-The content returned by the viewlet will by default be cached for 60s. Use the ``timeout`` argument to change this.
-
-.. code-block:: python
-
-    @viewlet(timeout=30*60)
-    def hello_user(context, name):
-        return render_to_string('hello_user.html', {'name': name})
-
-..
-
-    **Tip:** Set ``timeout`` to ``None`` to cache forever and use ``viewlet.refresh`` to update the cache.
-
-
-Django viewlet will by default build a cache key ``viewlet:name(args...)``.
-To customize this key pass a string to the viewlet decorator argument ``key``
-
-.. code-block:: python
-
-    @viewlet(timeout=30*60, key='some_cache_key')
-    def hello_user(context, name):
-        return render_to_string('hello_user.html', {'name': name})
-
-
-Django viewlet will cache context instead of html by using the ``template`` decorator argument.
-This is useful if cached html is too heavy, or your viewlet template needs to be rendered on every call.
-
-.. code-block:: python
-
-    @viewlet(template='hello_user.html', timeout=30*60)
-    def hello_user(context, name):
-        return {'name': name}
-
-..
-
-    **Note:** Return context dict for the template, not rendered html/text
-
-
-If there is no need for caching, set the viewlet decorator argument ``cached`` to ``False``
-
-.. code-block:: python
-
-    @viewlet(cached=False)
-    def hello_user(context, name):
-        return render_to_string('hello_user.html', {'name': name})
-
-
-By default you viewlets will be named as the function. To override this you can set the decorator argument ``name``
-
-.. code-block:: python
-
-    @viewlet(name='greeting')
-    def hello_user(context, name):
-        return render_to_string('hello_user.html', {'name': name})
-
-
-A powerful usage of ``viewlet.refresh`` is to use it together with Django signals:
-
-.. code-block:: python
-
-    class Product(Model):
-        name = CharField(max_length=255)
 
     @viewlet(timeout=None)
     def product_teaser(context, id):
         product = get_context_object(Product, id, context)
-        return render_to_string('product_teaser.html', locals())
+        return render_to_string('product_teaser.html', {'product': product})
 
     def refresh_product_teaser(instance, **kwargs):
         viewlet.refresh('product_teaser', instance.id)
@@ -179,20 +118,13 @@ A powerful usage of ``viewlet.refresh`` is to use it together with Django signal
     post_save.connect(refresh_product_teaser, Product)
 
 
-Viewlets can also be accesses with AJAX by adding ``viewlet.urls`` to your Django root urls:
+Sum up
+------
+This will increase your speed, always showing nearly live data and gaining control over the cached parts of your templates.
+No more stalling pages or suffering end users.
 
-.. code-block:: python
+Clone, fork or read the full documentation at: https://github.com/5monkeys/django-viewlet
 
-    urlpatterns = patterns('',
-        (r'^viewlet/', include('viewlet.urls')),
-    )
-
-
-The url ends with the viewlet name followed by a querystring used as ``kwargs`` to the viewlet:
-
-..
-
-    http://localhost:8000/viewlet/[name]/?arg=1...
 
 .. image:: https://travis-ci.org/5monkeys/django-viewlet.png?branch=master
     :target: http://travis-ci.org/5monkeys/django-viewlet
