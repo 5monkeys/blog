@@ -100,7 +100,7 @@ nav a i {
 }
 
 #content h3 {
-    margin-top: 2em;
+    margin-top: 1.4em;
     font-size: 18pt;
     color: #333;
 }
@@ -172,6 +172,12 @@ code, pre {
     /*border-left: 10px solid #eee;*/
     /*margin: 2em 0 2em -35px;*/
     /*padding: 10px 10px 10px 25px;*/
+}
+
+tt {
+    font-family: Monaco,Menlo,Consolas,"Courier New",monospace;
+    font-size: 0.9em;
+    color: #383;
 }
 
 @media print {
