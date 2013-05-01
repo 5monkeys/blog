@@ -43,6 +43,7 @@
         <div class="tags">
                         <span class="tag"><i class="icon-tag"></i> cache</span>
                         <span class="tag"><i class="icon-tag"></i> template</span>
+                        <span class="tag"><i class="icon-tag"></i> optimizing</span>
                     </div>
         <footer class="post-info">
             <abbr class="published" title="2012-11-17T12:00:00">
@@ -53,30 +54,54 @@
                 </address>
             </footer>
         <div class="entry-content">
-            <div class="section" id="installation">
-<h2>Installation</h2>
-<p>Install django-viewlet in your python&nbsp;environment</p>
-<div class="highlight"><pre><span class="nv">$ </span>pip install django-viewlet
-</pre></div>
-<p>Add <tt class="docutils literal">viewlet</tt> to your <tt class="docutils literal">INSTALLED_APPS</tt> setting so Django can find the template&nbsp;tag</p>
-<div class="highlight"><pre><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="o">...</span>
-    <span class="s">&#39;viewlet&#39;</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-<p>If you&#8217;re using Jinja2 as your template engine put this in your Django&nbsp;settings</p>
-<div class="highlight"><pre><span class="n">JINJA2_GLOBALS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&#39;viewlet&#39;</span><span class="p">:</span> <span class="s">&#39;viewlet.call_viewlet&#39;</span>
-<span class="p">}</span>
-
-<span class="n">VIEWLET_TEMPLATE_ENGINE</span> <span class="o">=</span> <span class="s">&#39;jinja2&#39;</span>
-</pre></div>
+            <div class="section" id="find-and-analyze-your-problem">
+<h2>Find and analyze your&nbsp;problem</h2>
+<p>A common problem when building web sites is that they tend to load slower and slower when the user base starts to grow,
+and the requests/sec has to reach the next&nbsp;level.</p>
+<p>These slow responses often depend on third party resources like a database or external service api&#8217;s.
+A great solution to improve page speed is to start caching slow parts of your logic and&nbsp;context.</p>
+<p>But, before doing this you should always try to optimize the code that are about to be cached, you don&#8217;t want to &#8220;hide&#8221; dirty&nbsp;code.</p>
+<p>A few simple&nbsp;tips:</p>
+<ul class="simple">
+<li>try to decrease number of database&nbsp;queries</li>
+<li>make sure your slow or common queries are well&nbsp;indexed</li>
+<li>if using Django&#8217;s <span class="caps">ORM</span>, use .values() or .values_list() to fetch less data and decrease&nbsp;cpu/mem.</li>
+<li>fine-tune your resources to line up with your current state of load and&nbsp;memory</li>
+</ul>
+<p>So, just by caching your way out doesn&#8217;t mean that your code won&#8217;t be run, and still needs to perform well.
+The next step is to figure out <em>what</em> to cache, <em>when</em> and <em>how</em> to trigger&nbsp;it.</p>
+<div class="section" id="django-s-cache-framework">
+<h3>Django&#8217;s cache&nbsp;framework</h3>
+<p>Django has a few built in solutions for caching, per-site, per-view and template fragment caching.
+Per-site and per-view are great tools when your response is anonymous, not containing any user specific stuff
+and if your content doesn&#8217;t get updated&nbsp;frequently.</p>
+<p>Since these two will cache your whole response they are quite hard to use on highly dynamic pages. <tt class="docutils literal">Varnish</tt> could be a better&nbsp;alternative.</p>
+<p>Template fragment cache on the other hand is a good way to cache parts of your template that are equal to every user like a menu, sidebar, footer&nbsp;etc.</p>
 </div>
+<div class="section" id="caching-the-right-stuff">
+<h3>Caching the right&nbsp;stuff</h3>
+<p>This seems to be an easy and good way to solve your problem, but what if the &#8220;slow&#8221; context variable, like a queryset, already have been executed in the view resulting an even slower page,
+since you&#8217;re not caching the slow stuff but actually adding one more resource to the page, the cache it self.
+This can be solved by using Django&#8217;s inclusion tags and move context related code from your view to a new tag and wrap that with a cache tag, quite&nbsp;messy.</p>
+</div>
+<div class="section" id="timeouts">
+<h3>Timeouts</h3>
+<p>Another problem when caching is that you mostly need to set a timeout, for example using the cache tag and set the timeout to 300 seconds,
+resulting in your actual code to be re-run every 5 minute. The issue here lies in the re-run part. There&#8217;s no async stuff going on here,
+meaning that one of your regular requests will be the one hitting the timeout and causing the code to run once again and re-fill the cache.
+A dirty &#8220;solution&#8221; to this is to brute-force loading your site with a cron-like utility and at a higher frequency than your cache&nbsp;timeouts.</p>
+</div>
+</div>
+<div class="section" id="solving-the-problem">
+<h2>Solving the&nbsp;problem</h2>
+<p>In my opinion, this is not a good way to cache your site, because the speed will vary and the end user will take the hit and trigger your data to&nbsp;reload.</p>
+<p>This is why we wrote <tt class="docutils literal">Django Viewlet</tt>.</p>
+<p>A viewlet is almost like a function based django view, taking a template context as first argument instead of request.
+The result of a viewlet is cached and, best of all, able to be refreshed.
+It&#8217;s recommended to set your viewlet to never timeout, meaning cache&nbsp;forever.</p>
 <div class="section" id="usage">
-<h2>Usage</h2>
-<p>A viewlet is almost like a function based django view, taking a template context
-as first argument instead of request.
-Place your viewlets in <tt class="docutils literal">viewlets.py</tt> or existing <tt class="docutils literal">views.py</tt> in your django app&nbsp;directory.</p>
+<h3>Usage</h3>
+<p>Place your viewlets in <tt class="docutils literal">viewlets.py</tt> or existing <tt class="docutils literal">views.py</tt> in your django app&nbsp;directory.</p>
 <div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.template.loader</span> <span class="kn">import</span> <span class="n">render_to_string</span>
 <span class="kn">from</span> <span class="nn">viewlet</span> <span class="kn">import</span> <span class="n">viewlet</span>
 
@@ -88,114 +113,36 @@ Place your viewlets in <tt class="docutils literal">viewlets.py</tt> or existing
 <div class="highlight"><pre>{% load viewlets %}
 <span class="nt">&lt;p&gt;</span>{% viewlet hello_user request.user.username %}<span class="nt">&lt;/p&gt;</span>
 </pre></div>
-<p>&#8230; and in your Jinja2&nbsp;templates:</p>
-<div class="highlight"><pre><span class="nt">&lt;p&gt;</span>{{ viewlet(&#39;host_sponsors&#39;, host.id) }}<span class="nt">&lt;/p&gt;</span>
-</pre></div>
+<p>Normally you&#8217;ll return a rendered template from your viewlet,
+but you can also return a context if you need your viewlet template to be rendered on every request, causing the context itself to be cached&nbsp;instead.</p>
+</div>
 <div class="section" id="refreshing-viewlets">
 <h3>Refreshing&nbsp;viewlets</h3>
 <p>A cached viewlet can be re-rendered and updated behind the scenes with <tt class="docutils literal">viewlet.refresh</tt></p>
 <div class="highlight"><pre><span class="kn">import</span> <span class="nn">viewlet</span>
 <span class="n">viewlet</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="s">&#39;hello_user&#39;</span><span class="p">,</span> <span class="s">&#39;monkey&#39;</span><span class="p">)</span>
 </pre></div>
-</div>
-<div class="section" id="the-decorator">
-<h3>The&nbsp;decorator</h3>
-<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">cached</span><span class="p">)</span>
-</pre></div>
-<ul>
-<li><dl class="first docutils">
-<dt>name</dt>
-<dd><p class="first last">Optional reference name for the viewlet, defaults to function&nbsp;name.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>template</dt>
-<dd><p class="first last">Optional path to template. If specified the viewlet must return a context dict,
-otherwise it is responsible to return the rendered output&nbsp;itself.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>key</dt>
-<dd><p class="first last">Optional cache key, if not specified a dynamic key will be generated <tt class="docutils literal"><span class="pre">viewlet:name(args&#8230;)</span></tt></p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>timeout</dt>
-<dd><p class="first last">Cache timeout. Defaults to 60 sec, None = eternal, 0 =&nbsp;uncached.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt>cached</dt>
-<dd><p class="first last">Defaults to True, if set to False timeout will be 0 and therefore&nbsp;uncached.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</div>
-<div class="section" id="examples">
-<h3>Examples</h3>
-<p>The content returned by the viewlet will by default be cached for 60s. Use the <tt class="docutils literal">timeout</tt> argument to change&nbsp;this.</p>
-<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
-</pre></div>
-<!--  -->
-<blockquote>
-<strong>Tip:</strong> Set <tt class="docutils literal">timeout</tt> to <tt class="docutils literal">None</tt> to cache forever and use <tt class="docutils literal">viewlet.refresh</tt> to update the cache.</blockquote>
-<p>Django viewlet will by default build a cache key <tt class="docutils literal"><span class="pre">viewlet:name(args&#8230;)</span></tt>.
-To customize this key pass a string to the viewlet decorator argument <tt class="docutils literal">key</tt></p>
-<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s">&#39;some_cache_key&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
-</pre></div>
-<p>Django viewlet will cache context instead of html by using the <tt class="docutils literal">template</tt> decorator argument.
-This is useful if cached html is too heavy, or your viewlet template needs to be rendered on every&nbsp;call.</p>
-<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">}</span>
-</pre></div>
-<!--  -->
-<blockquote>
-<strong>Note:</strong> Return context dict for the template, not rendered html/text</blockquote>
-<p>If there is no need for caching, set the viewlet decorator argument <tt class="docutils literal">cached</tt> to <tt class="docutils literal">False</tt></p>
-<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">cached</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
-</pre></div>
-<p>By default you viewlets will be named as the function. To override this you can set the decorator argument <tt class="docutils literal">name</tt></p>
-<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;greeting&#39;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">hello_user</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;hello_user.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
-</pre></div>
-<p>A powerful usage of <tt class="docutils literal">viewlet.refresh</tt> is to use it together with Django&nbsp;signals:</p>
-<div class="highlight"><pre><span class="k">class</span> <span class="nc">Product</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
-
-<span class="nd">@viewlet</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<p>Content on your site will always get updated by some kind of action, like saving a model or a celery task being executed, modifying some&nbsp;data.</p>
+<p>Try to find these triggers and then hook in your viewlet.refresh&nbsp;there.</p>
+<p>Django signals is a good way of doing this, by either connecting to an existing one like post_save, or dispatching your&nbsp;own.</p>
+<div class="highlight"><pre><span class="nd">@viewlet</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">product_teaser</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
     <span class="n">product</span> <span class="o">=</span> <span class="n">get_context_object</span><span class="p">(</span><span class="n">Product</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;product_teaser.html&#39;</span><span class="p">,</span> <span class="nb">locals</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s">&#39;product_teaser.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;product&#39;</span><span class="p">:</span> <span class="n">product</span><span class="p">})</span>
 
 <span class="k">def</span> <span class="nf">refresh_product_teaser</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">viewlet</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="s">&#39;product_teaser&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 
 <span class="n">post_save</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">refresh_product_teaser</span><span class="p">,</span> <span class="n">Product</span><span class="p">)</span>
 </pre></div>
-<p>Viewlets can also be accesses with <span class="caps">AJAX</span> by adding <tt class="docutils literal">viewlet.urls</tt> to your Django root&nbsp;urls:</p>
-<div class="highlight"><pre><span class="n">urlpatterns</span> <span class="o">=</span> <span class="n">patterns</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span>
-    <span class="p">(</span><span class="s">r&#39;^viewlet/&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s">&#39;viewlet.urls&#39;</span><span class="p">)),</span>
-<span class="p">)</span>
-</pre></div>
-<p>The url ends with the viewlet name followed by a querystring used as <tt class="docutils literal">kwargs</tt> to the&nbsp;viewlet:</p>
-<!--  -->
-<blockquote>
-<a class="reference external" href="http://localhost:8000/viewlet/[name]/?arg=1">http://localhost:8000/viewlet/[name]/?arg=1</a>&#8230;</blockquote>
-<a class="reference external image-reference" href="http://travis-ci.org/5monkeys/django-viewlet"><img alt="https://travis-ci.org/5monkeys/django-viewlet.png?branch=master" src="https://travis-ci.org/5monkeys/django-viewlet.png?branch=master" /></a>
 </div>
+</div>
+<div class="section" id="sum-up">
+<h2>Sum&nbsp;up</h2>
+<p>This will increase your speed, always showing nearly live data and gaining control over the cached parts of your templates.
+No more stalling pages or suffering end&nbsp;users.</p>
+<p>Clone, fork or read the full documentation at: <a class="reference external" href="https://github.com/5monkeys/django-viewlet">https://github.com/5monkeys/django-viewlet</a></p>
+<a class="reference external image-reference" href="http://travis-ci.org/5monkeys/django-viewlet"><img alt="https://travis-ci.org/5monkeys/django-viewlet.png?branch=master" src="https://travis-ci.org/5monkeys/django-viewlet.png?branch=master" /></a>
 </div>
 
         </div>
