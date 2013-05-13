@@ -9,6 +9,8 @@ Django Viewlet
 :summary: Render template parts with extended cache control.
 
 
+*(Draft)*
+
 Find and analyze your problem
 -----------------------------
 A common problem when building web sites is that they tend to load slower and slower when the user base starts to grow,
