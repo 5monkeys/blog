@@ -23,9 +23,9 @@
 
 &lt;/style&gt;
 
-&lt;script src="static/js/jquery-1.9.1.min.js"&gt;&lt;/script&gt;
+&lt;script src="js/jquery-1.9.1.min.js"&gt;&lt;/script&gt;
 
-&lt;script src="static/js/jquery.zoomenhance.js"&gt;&lt;/script&gt;
+&lt;script src="js/jquery.zoomenhance.js"&gt;&lt;/script&gt;
 
 &lt;script&gt;
     $(function() {
