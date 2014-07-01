@@ -23,9 +23,9 @@
 
 &lt;/style&gt;
 
-&lt;script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script src="static/js/jquery-1.9.1.min.js"&gt;&lt;/script&gt;
 
-&lt;script src="http://raw.githubusercontent.com/5monkeys/zoomenhance/master/jquery.zoomenhance.js"&gt;&lt;/script&gt;
+&lt;script src="static/js/jquery.zoomenhance.js"&gt;&lt;/script&gt;
 
 &lt;script&gt;
     $(function() {
