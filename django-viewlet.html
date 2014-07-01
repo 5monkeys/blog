@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html" lang="en">
     <head>
-    <title>Django Viewlet - 5 Monkeys - Labs blog</title>
+<title>Django Viewlet - 5 Monkeys - Labs blog</title>
         <meta charset="utf-8" />
         <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
         <link href="http://labs.5monkeys.se/theme/css/main.css" rel="stylesheet" media="screen">
         <link href="http://labs.5monkeys.se/theme/img/monkey.png" rel="icon" type="image/png" />
 
-        
+
     </head>
 
     <body>
@@ -21,7 +21,7 @@
                 <nav id="menu" class="navbar">
                     <h1><a href="http://labs.5monkeys.se">5 Monkeys</a></h1>
                     <span class="subtitle">labs blog</span>
-                    <ul>                                                                        </ul>
+                    <ul></ul>
                 </nav>
             </div>
         </header>
@@ -29,31 +29,31 @@
         <div id="page" class="container">
 
             <section id="content">
-                
+
     <article>
         <header>
             <h1 class="entry-title">
               <a href="http://labs.5monkeys.se/django-viewlet.html" rel="bookmark"
                  title="Permalink to Django Viewlet">Django&nbsp;Viewlet</a></h1>
-                        
+            
         </header>
         <div class="summary">
-            <p class="first last">Render template parts with extended cache control.</p>
+            <p class="first last">Render template parts with extended cache&nbsp;control.</p>
 
         </div>
         <div class="tags">
-                        <span class="tag"><i class="icon-tag"></i> cache</span>
-                        <span class="tag"><i class="icon-tag"></i> template</span>
-                        <span class="tag"><i class="icon-tag"></i> optimizing</span>
-                    </div>
+            <span class="tag"><i class="icon-tag"></i> cache</span>
+            <span class="tag"><i class="icon-tag"></i> template</span>
+            <span class="tag"><i class="icon-tag"></i> optimizing</span>
+        </div>
         <footer class="post-info">
             <abbr class="published" title="2012-11-17T12:00:00">
                 Sat 17 November 2012
             </abbr>
-            <address class="vcard author">
-                                        By Jonas Lundberg
+<address class="vcard author">
+                    By Jonas Lundberg
                 </address>
-            </footer>
+</footer>
         <div class="entry-content">
             <p><em>(Draft)</em></p>
 <div class="section" id="find-and-analyze-your-problem">
@@ -62,7 +62,7 @@
 and the requests/sec has to reach the next&nbsp;level.</p>
 <p>These slow responses often depend on third party resources like a database or external service api&#8217;s.
 A great solution to improve page speed is to start caching slow parts of your logic and&nbsp;context.</p>
-<p>But, before doing this you should always try to optimize the code that are about to be cached, you don&#8217;t want to &#8220;hide&#8221; dirty&nbsp;code.</p>
+<p>But, before doing this you should always try to optimize the code that are about to be cached, you don&#8217;t want to &quot;hide&quot; dirty&nbsp;code.</p>
 <p>A few simple&nbsp;tips:</p>
 <ul class="simple">
 <li>try to decrease number of database&nbsp;queries</li>
@@ -82,7 +82,7 @@ and if your content doesn&#8217;t get updated&nbsp;frequently.</p>
 </div>
 <div class="section" id="caching-the-right-stuff">
 <h3>Caching the right&nbsp;stuff</h3>
-<p>This seems to be an easy and good way to solve your problem, but what if the &#8220;slow&#8221; context variable, like a queryset, already have been executed in the view resulting an even slower page,
+<p>This seems to be an easy and good way to solve your problem, but what if the &quot;slow&quot; context variable, like a queryset, already have been executed in the view resulting an even slower page,
 since you&#8217;re not caching the slow stuff but actually adding one more resource to the page, the cache it self.
 This can be solved by using Django&#8217;s inclusion tags and move context related code from your view to a new tag and wrap that with a cache tag, quite&nbsp;messy.</p>
 </div>
@@ -91,7 +91,7 @@ This can be solved by using Django&#8217;s inclusion tags and move context relat
 <p>Another problem when caching is that you mostly need to set a timeout, for example using the cache tag and set the timeout to 300 seconds,
 resulting in your actual code to be re-run every 5 minute. The issue here lies in the re-run part. There&#8217;s no async stuff going on here,
 meaning that one of your regular requests will be the one hitting the timeout and causing the code to run once again and re-fill the cache.
-A dirty &#8220;solution&#8221; to this is to brute-force loading your site with a cron-like utility and at a higher frequency than your cache&nbsp;timeouts.</p>
+A dirty &quot;solution&quot; to this is to brute-force loading your site with a cron-like utility and at a higher frequency than your cache&nbsp;timeouts.</p>
 </div>
 </div>
 <div class="section" id="solving-the-problem">
@@ -144,7 +144,7 @@ but you can also return a context if you need your viewlet template to be render
 <p>This will increase your speed, always showing nearly live data and gaining control over the cached parts of your templates.
 No more stalling pages or suffering end&nbsp;users.</p>
 <p>Clone, fork or read the full documentation at: <a class="reference external" href="https://github.com/5monkeys/django-viewlet">https://github.com/5monkeys/django-viewlet</a></p>
-<a class="reference external image-reference" href="http://travis-ci.org/5monkeys/django-viewlet"><img alt="https://travis-ci.org/5monkeys/django-viewlet.png?branch=master" src="https://travis-ci.org/5monkeys/django-viewlet.png?branch=master" /></a>
+<a class="reference external image-reference" href="http://travis-ci.org/5monkeys/django-viewlet"><img alt="" src="https://travis-ci.org/5monkeys/django-viewlet.png?branch=master" /></a>
 </div>
 
         </div>

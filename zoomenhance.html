@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html" lang="en">
+    <head>
+<title>Zoom/Enhance - 5 Monkeys - Labs blog</title>
+        <meta charset="utf-8" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link href="http://labs.5monkeys.se/theme/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="http://labs.5monkeys.se/theme/css/font-awesome.min.css" rel="stylesheet" media="screen">
+        <link href="http://labs.5monkeys.se/theme/css/pygments.css" rel="stylesheet" media="screen">
+        <link href="http://labs.5monkeys.se/theme/css/main.css" rel="stylesheet" media="screen">
+        <link href="http://labs.5monkeys.se/theme/img/monkey.png" rel="icon" type="image/png" />
+
+
+    </head>
+
+    <body>
+        <header id="header">
+            <div class="container">
+                <nav id="menu" class="navbar">
+                    <h1><a href="http://labs.5monkeys.se">5 Monkeys</a></h1>
+                    <span class="subtitle">labs blog</span>
+                    <ul></ul>
+                </nav>
+            </div>
+        </header>
+
+        <div id="page" class="container">
+
+            <section id="content">
+
+    <article>
+        <header>
+            <h1 class="entry-title">
+              <a href="http://labs.5monkeys.se/zoomenhance.html" rel="bookmark"
+                 title="Permalink to Zoom/Enhance">Zoom/Enhance</a></h1>
+            
+        </header>
+        <div class="summary">
+            <p>A zooming, enhancing lens for the&nbsp;Web</p>
+        </div>
+        <div class="tags">
+            <span class="tag"><i class="icon-tag"></i> zoom</span>
+            <span class="tag"><i class="icon-tag"></i> enhance</span>
+            <span class="tag"><i class="icon-tag"></i> javascript</span>
+            <span class="tag"><i class="icon-tag"></i> html</span>
+            <span class="tag"><i class="icon-tag"></i> ui</span>
+        </div>
+        <footer class="post-info">
+            <abbr class="published" title="2014-07-01T12:00:00">
+                Tue 01 July 2014
+            </abbr>
+<address class="vcard author">
+                    By Ludvig Ericson
+                </address>
+</footer>
+        <div class="entry-content">
+            <style>
+
+  .zoomenhance-overlay {
+    background-color: #ccc;
+    background-repeat: no-repeat;
+    width: 200px;
+    height: 200px;
+    cursor: none;
+    display: block;
+    position: absolute;
+    border: 2px solid white;
+    border-radius: 100px;
+    box-shadow: #777 0px 0px 10px,
+                black 0px 0px 8px inset,
+                white 0px 0px 20px inset;
+
+    /* Makes own render layer -- snappy as hell! */
+    -webkit-transform: translatez(0);
+    -o-transform: translatez(0);
+    transform: translatez(0);
+  }
+
+</style>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<script src="http://raw.githubusercontent.com/5monkeys/zoomenhance/master/jquery.zoomenhance.js"></script>
+
+<script>
+    $(function() {
+      $('img.demo-native').zoomenhance({ manualCss: true });
+      $('.magazine-covers img').zoomenhance({ manualCss: true,
+                                              zoomFactor: 3 });
+    });
+</script>
+
+<iframe width="853" height="480" src="http://www.youtube.com/embed/LhF_56SxrGk?rel=0" frameborder="0" allowfullscreen></iframe>
+
+<p>Zoom/enhance is a jQuery plugin that adds a zooming lens to high-resolution&nbsp;images.</p>
+<p><a href="http://github.com/5monkeys/zoomenhance/">More information on GitHub</a>.</p>
+<h2>Original&nbsp;usecase</h2>
+<p>We wanted to show magazine covers and sometimes the user would need to &#8220;read
+the fine print,&#8221; this proved challenging because we could either blow up the
+image size so the rest of the interface suffered just to show a tiny text, or
+we could do what we did: a magnifying glass. Try to find the issue number or
+date in the magazine covers&nbsp;below!</p>
+<div class="magazine-covers">
+  <img width="350" src="http://www.webdesignburn.com/wp-content/uploads/2011/12/Angelina.Jolie_.MagazineCover.jpg">
+  <img width="350" src="http://slangrap.files.wordpress.com/2010/03/vibe02_treycvr.jpg">
+  <img width="350" src="http://assets.nydailynews.com/polopoly_fs/1.1401122.1401897053!/img/httpImage/image.jpg_gen/derivatives/gallery_1200/rolling-stone.jpg">
+  <img width="350" src="http://www.imore.com/sites/imore.com/files/images/stories/2010/04/time-100401.png">
+</div>
+
+<h2>Fractal&nbsp;broccoli</h2>
+<p><img width="500" src="http://static.parade.condenast.com/wp-content/uploads/2013/06/romanesco-ftr.jpg" class="demo-native"></p>
+        </div>
+    </article>
+
+            </section>
+
+            <footer id="footer">
+                <address>
+                    <a href="http://www.5monkeys.se/">5 Monkeys</a> &copy; 2013
+                </address>
+            </footer>
+
+        </div>
+    </body>
+</html>

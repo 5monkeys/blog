@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>5 Monkeys</title><link>http://labs.5monkeys.se/</link><description>labs blog</description><atom:link href="http://labs.5monkeys.se/feeds/ludvig-ericson.rss.xml" rel="self"></atom:link><lastBuildDate>Tue, 01 Jul 2014 12:00:00 +0200</lastBuildDate><item><title>Zoom/Enhance</title><link>http://labs.5monkeys.se/zoomenhance.html</link><description>&lt;style&gt;
+
+  .zoomenhance-overlay {
+    background-color: #ccc;
+    background-repeat: no-repeat;
+    width: 200px;
+    height: 200px;
+    cursor: none;
+    display: block;
+    position: absolute;
+    border: 2px solid white;
+    border-radius: 100px;
+    box-shadow: #777 0px 0px 10px,
+                black 0px 0px 8px inset,
+                white 0px 0px 20px inset;
+
+    /* Makes own render layer -- snappy as hell! */
+    -webkit-transform: translatez(0);
+    -o-transform: translatez(0);
+    transform: translatez(0);
+  }
+
+&lt;/style&gt;
+
+&lt;script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"&gt;&lt;/script&gt;
+
+&lt;script src="http://raw.githubusercontent.com/5monkeys/zoomenhance/master/jquery.zoomenhance.js"&gt;&lt;/script&gt;
+
+&lt;script&gt;
+    $(function() {
+      $('img.demo-native').zoomenhance({ manualCss: true });
+      $('.magazine-covers img').zoomenhance({ manualCss: true,
+                                              zoomFactor: 3 });
+    });
+&lt;/script&gt;
+
+&lt;iframe width="853" height="480" src="http://www.youtube.com/embed/LhF_56SxrGk?rel=0" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;
+
+&lt;p&gt;Zoom/enhance is a jQuery plugin that adds a zooming lens to high-resolution&amp;nbsp;images.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://github.com/5monkeys/zoomenhance/"&gt;More information on GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Original&amp;nbsp;usecase&lt;/h2&gt;
+&lt;p&gt;We wanted to show magazine covers and sometimes the user would need to &amp;#8220;read
+the fine print,&amp;#8221; this proved challenging because we could either blow up the
+image size so the rest of the interface suffered just to show a tiny text, or
+we could do what we did: a magnifying glass. Try to find the issue number or
+date in the magazine covers&amp;nbsp;below!&lt;/p&gt;
+&lt;div class="magazine-covers"&gt;
+  &lt;img width="350" src="http://www.webdesignburn.com/wp-content/uploads/2011/12/Angelina.Jolie_.MagazineCover.jpg"&gt;
+  &lt;img width="350" src="http://slangrap.files.wordpress.com/2010/03/vibe02_treycvr.jpg"&gt;
+  &lt;img width="350" src="http://assets.nydailynews.com/polopoly_fs/1.1401122.1401897053!/img/httpImage/image.jpg_gen/derivatives/gallery_1200/rolling-stone.jpg"&gt;
+  &lt;img width="350" src="http://www.imore.com/sites/imore.com/files/images/stories/2010/04/time-100401.png"&gt;
+&lt;/div&gt;
+
+&lt;h2&gt;Fractal&amp;nbsp;broccoli&lt;/h2&gt;
+&lt;p&gt;&lt;img width="500" src="http://static.parade.condenast.com/wp-content/uploads/2013/06/romanesco-ftr.jpg" class="demo-native"&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ludvig Ericson</dc:creator><pubDate>Tue, 01 Jul 2014 12:00:00 +0200</pubDate><guid>tag:labs.5monkeys.se,2014-07-01:zoomenhance.html</guid><category>zoom</category><category>enhance</category><category>javascript</category><category>html</category><category>ui</category></item></channel></rss>
