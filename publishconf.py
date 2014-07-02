@@ -11,4 +11,4 @@ sys.path.append(os.curdir)
 from pelicanconf import *
 
 RELATIVE_URLS = False
-FILES_TO_COPY = (('CNAME', 'CNAME'),)
+STATIC_PATHS = ['CNAME']
